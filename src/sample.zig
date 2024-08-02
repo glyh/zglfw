@@ -1,5 +1,5 @@
 const std = @import("std");
-const glfw = @import("glfw");
+const glfw = @import("glfw.zig");
 
 pub fn main() !void {
     var major: i32 = 0;
@@ -16,7 +16,7 @@ pub fn main() !void {
     defer glfw.terminate();
     std.debug.print("GLFW Init Succeeded.\n", .{});
 
-    var window: *glfw.Window = try glfw.createWindow(800, 640, "Hello World", null, null);
+    const window: *glfw.Window = try glfw.createWindow(800, 640, "Hello World", null, null);
     defer glfw.destroyWindow(window);
 
     while (!glfw.windowShouldClose(window)) {

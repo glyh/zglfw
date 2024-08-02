@@ -9,8 +9,6 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
-    lib.linkLibC();
-    lib.linkSystemLibrary("glfw");
     b.installArtifact(lib);
 
     const exe = b.addExecutable(.{
@@ -19,10 +17,17 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
-    exe.linkLibrary(lib);
-
-    _ = b.addModule("glfw", .{ .root_source_file = b.path("src/glfw.zig") });
     b.installArtifact(exe);
+
+    const module_export = b.addModule("glfw", .{
+        .root_source_file = b.path("src/glfw.zig"),
+        .target = target,
+    });
+
+    inline for ([_]*std.Build.Module{ &lib.root_module, &exe.root_module, module_export }) |m| {
+        m.linkSystemLibrary("glfw", .{});
+        m.link_libc = true;
+    }
 
     const run_cmd = b.addRunArtifact(exe);
     run_cmd.step.dependOn(b.getInstallStep());
